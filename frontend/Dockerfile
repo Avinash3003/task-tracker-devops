@@ -1,13 +1,26 @@
-FROM node:20-slim
+FROM node:20-slim AS builder
 
 WORKDIR /frontend
 
 COPY package*.json ./
 
-RUN npm install
+RUN npm install 
 
 COPY . .
 
-EXPOSE 5173
+ENV VITE_API_URL=/api
+RUN npm run build
 
-CMD ["npm","run","dev"]
+# ---------
+
+FROM nginx:alpine
+
+# Copy our custom nginx configuration
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Copy React build output
+COPY --from=builder /frontend/dist /usr/share/nginx/html
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]

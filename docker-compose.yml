@@ -1,0 +1,47 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: postgres-db
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: tasktracker
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - tasktracker-network
+
+  backend-service:
+    build: ./backend
+    container_name: backend-container
+    environment:
+      DATABASE_URL: postgresql://user:password@db:5432/tasktracker
+    depends_on:
+      - db
+    restart: unless-stopped
+    networks:
+      - tasktracker-network
+
+
+  frontend-service: 
+    build: ./frontend
+    container_name: frontend-container
+    ports:
+      - "80:80"
+    depends_on:
+      - backend-service
+    networks:
+      - tasktracker-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data: 
+
+networks:
+  tasktracker-network:
+    driver: bridge
