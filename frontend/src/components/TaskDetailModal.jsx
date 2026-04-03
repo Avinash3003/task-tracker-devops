@@ -46,9 +46,17 @@ export default function TaskDetailModal({ task, onClose, onDelete, onTaskUpdate 
                     </div>
                 )}
               </div>
-              <div className="form-group" style={{marginTop: '1rem'}}>
-                  <label>Assignee</label>
-                  <UserSelect value={task.assigned_user_id || ""} onChange={handleAssign} />
+              <div style={{display: 'flex', gap: '1rem', marginTop: '1rem'}}>
+                <div className="form-group" style={{flex: 1}}>
+                    <label>Created By</label>
+                    <div style={{padding: '0.6rem 0.8rem', background: 'var(--bg-secondary)', borderRadius: 'var(--radius)', color: 'var(--text-secondary)', fontSize: '0.95rem', border: '1px solid var(--border-glow)'}}>
+                        {task.owner?.username || 'Unknown'}
+                    </div>
+                </div>
+                <div className="form-group" style={{flex: 1}}>
+                    <label>Assignee</label>
+                    <UserSelect value={task.assigned_user_id || ""} onChange={handleAssign} />
+                </div>
               </div>
               <div className="task-detail-description" style={{marginTop: '1.5rem', marginBottom: '1.5rem'}}>
                 <h3>Description</h3>

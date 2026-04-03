@@ -4,4 +4,6 @@ dist/
 __pycache__/
 *.pyc
 .env
+.env.*
 venv/
+k8s/secret.yaml

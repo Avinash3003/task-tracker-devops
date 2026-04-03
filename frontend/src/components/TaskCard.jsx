@@ -56,14 +56,18 @@ export default function TaskCard({ task, onClick, onDelete }) {
         {task.description || 'No description'}
       </p>
       
-      {task.assignee && (
-         <div className="task-assignee">
-           <div className="assignee-avatar">
-              {task.assignee.username.charAt(0).toUpperCase()}
-           </div>
-           <span>{task.assignee.username}</span>
+      <div className="task-assignee-group" style={{display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginTop: '0.5rem'}}>
+         <div style={{background: 'var(--bg-secondary)', padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.25rem'}}>
+            <span style={{color: 'var(--text-muted)'}}>By:</span>
+            <span style={{fontWeight: 600, color: 'var(--text-primary)'}}>{task.owner?.username || 'Unknown'}</span>
          </div>
-      )}
+         {task.assignee && (
+           <div style={{background: 'var(--bg-secondary)', padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.25rem'}}>
+              <span style={{color: 'var(--text-muted)'}}>For:</span>
+              <span style={{fontWeight: 600, color: 'var(--text-primary)'}}>{task.assignee.username}</span>
+           </div>
+         )}
+      </div>
 
       <div className="task-card-footer" style={{marginTop: '1rem'}}>
         <span className="task-created-text">
