@@ -3,7 +3,14 @@ dist/
 *.db
 __pycache__/
 *.pyc
+venv/
+
+# Environment variable files — never commit these
 .env
 .env.*
-venv/
+!.env.example
+backend/.env.dev
+backend/app.log
+
+# Kubernetes secrets — never commit these
 k8s/secret.yaml
