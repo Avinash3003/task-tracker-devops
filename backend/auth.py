@@ -1,5 +1,7 @@
 from datetime import datetime, timedelta, timezone
+import os
 import jwt
+from dotenv import load_dotenv
 from passlib.hash import bcrypt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
@@ -8,7 +10,12 @@ from sqlalchemy.orm import Session
 from database import get_db
 from models import User
 
-SECRET_KEY = "task-tracker-super-secret-key-2024-production"
+env_path = os.path.join(os.path.dirname(__file__), ".env.dev")
+load_dotenv(env_path)
+
+SECRET_KEY = os.getenv("SECRET_KEY")
+if not SECRET_KEY:
+    raise ValueError("CRITICAL ERROR: SECRET_KEY environment variable is not set!")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
