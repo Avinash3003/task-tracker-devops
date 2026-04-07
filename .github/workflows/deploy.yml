@@ -1,0 +1,52 @@
+name: CI/CD Pipeline
+
+# 1. TRIGGERS: This section tells GitHub WHEN to run the pipeline
+on:
+  push:
+    branches:
+      - main
+      - dev-cicd # It will trigger whenever you push code to this branch
+
+# 2. JOBS: This is the actual work the pipeline performs
+jobs:
+  build-and-deploy:
+    # 3. RUNNER: This is the MOST IMPORTANT line for your architecture!
+    # Instead of running on GitHub's cloud, this forces the job to route 
+    # directly to the 'actions-runner' process listening on your laptop.
+    runs-on: self-hosted
+    
+    steps:
+      # Step 1: Download the newly pushed code to your laptop's runner folder
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        
+      # Step 2: Log in to Docker Hub using the Secrets you set up
+      # This allows Docker to push the compiled images later.
+      - name: Login to Docker Hub
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+      # Step 3: Build the Backend into a new Docker Image
+      # Best Practice: using `github.sha` creates a strictly unique tag for every single code change!
+      - name: Build and Push Backend Image
+        run: |
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/task-tracker-cicd:backend-${{ github.sha }} ./backend
+          docker push ${{ secrets.DOCKER_USERNAME }}/task-tracker-cicd:backend-${{ github.sha }}
+
+      # Step 4: Build the Frontend into a new Docker Image
+      - name: Build and Push Frontend Image
+        run: |
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/task-tracker-cicd:frontend-${{ github.sha }} ./frontend
+          docker push ${{ secrets.DOCKER_USERNAME }}/task-tracker-cicd:frontend-${{ github.sha }}
+
+      # Step 5: DEPLOYMENT STAGE
+      # Because this script is running natively on your laptop, `kubectl` is immediately available
+      # and it commands your local Minikube cluster instantly!
+      - name: Deploy to Minikube
+        run: |
+          # Apply any changes made to Kubernetes YAML config files
+          kubectl apply -f k8s/
+          
+          # Patch the Deployments dynamically to use the brand new Docker Images we just pushed!
+          # This triggers Kubernetes to perform a zero-downtime rolling update.
+          kubectl set image deployment/backend-deployment backend=${{ secrets.DOCKER_USERNAME }}/task-tracker-cicd:backend-${{ github.sha }}
+          kubectl set image deployment/frontend-deployment frontend=${{ secrets.DOCKER_USERNAME }}/task-tracker-cicd:frontend-${{ github.sha }}
