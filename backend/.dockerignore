@@ -2,3 +2,4 @@ __pycache__/
 *.pyc
 task_tracker.db
 Dockerfile
+app.log
