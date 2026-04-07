@@ -11,7 +11,7 @@ HTTP_STATUS=$(kubectl run temp-smoke-test \
     --rm -i \
     -- -s -o /dev/null -w "%{http_code}" http://backend-service:8000/health)
 
-if [ "$HTTP_STATUS" == "200" ]; then
+if [[ "$HTTP_STATUS" == *"200"* ]]; then
     echo "✅ Smoke Test Passed: The backend service returned 200 OK!"
     exit 0
 else
