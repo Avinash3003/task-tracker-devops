@@ -50,3 +50,8 @@ jobs:
           # This triggers Kubernetes to perform a zero-downtime rolling update.
           kubectl set image deployment/backend-deployment backend=${{ secrets.DOCKER_USERNAME }}/task-tracker-cicd:backend-${{ github.sha }}
           kubectl set image deployment/frontend-deployment frontend=${{ secrets.DOCKER_USERNAME }}/task-tracker-cicd:frontend-${{ github.sha }}
+
+      # Step 6: AUTOMATED SMOKE TEST
+      # Instantly verify if the deployment successfully brought the system online
+      - name: Run Smoke Test
+        run: ./scripts/smoke_test.sh
