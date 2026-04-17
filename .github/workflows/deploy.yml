@@ -24,29 +24,28 @@ jobs:
       
       - name: Build and Push Backend Image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/task-tracker-cicd:backend-${{ github.sha }} ./backend
-          docker push ${{ secrets.DOCKER_USERNAME }}/task-tracker-cicd:backend-${{ github.sha }}
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/task-tracker-cicd:backend-v${{ github.run_number }} ./backend
+          docker push ${{ secrets.DOCKER_USERNAME }}/task-tracker-cicd:backend-v${{ github.run_number }}
 
       
       - name: Build and Push Frontend Image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/task-tracker-cicd:frontend-${{ github.sha }} ./frontend
-          docker push ${{ secrets.DOCKER_USERNAME }}/task-tracker-cicd:frontend-${{ github.sha }}
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/task-tracker-cicd:frontend-v${{ github.run_number }} ./frontend
+          docker push ${{ secrets.DOCKER_USERNAME }}/task-tracker-cicd:frontend-v${{ github.run_number }}
 
-      # DEPLOYMENT STAGE
-      # Because this script is running natively on your laptop, `kubectl` is immediately available
-      # and it commands your local Minikube cluster instantly!
       - name: Deploy to Minikube
         run: |
-          # Apply any changes made to Kubernetes YAML config files
+
           kubectl apply -f k8s/
           
-          # Patch the Deployments dynamically to use the brand new Docker Images we just pushed!
-          # This triggers Kubernetes to perform a zero-downtime rolling update.
-          kubectl set image deployment/backend-deployment backend=${{ secrets.DOCKER_USERNAME }}/task-tracker-cicd:backend-${{ github.sha }}
-          kubectl set image deployment/frontend-deployment frontend=${{ secrets.DOCKER_USERNAME }}/task-tracker-cicd:frontend-${{ github.sha }}
+          kubectl set image deployment/backend-deployment backend=${{ secrets.DOCKER_USERNAME }}/task-tracker-cicd:backend-v${{ github.run_number }}
+          kubectl set image deployment/frontend-deployment frontend=${{ secrets.DOCKER_USERNAME }}/task-tracker-cicd:frontend-v${{ github.run_number }}
 
       # AUTOMATED SMOKE TEST
       # Instantly verify if the deployment successfully brought the system online
       - name: Run Smoke Test
         run: ./scripts/smoke_test.sh
+
+
+
+

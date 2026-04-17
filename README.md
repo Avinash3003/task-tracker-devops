@@ -126,7 +126,13 @@ The project contains native manifests targeting a Minikube cluster environment.
 We employ a robust GitHub Actions pipeline mapped to `.github/workflows/deploy.yml`. 
 To bypass Minikube's hypervisor networking isolations, passing Cloud-to-Laptop restrictions securely, we use a **Self-Hosted Runner Daemon**. 
 
-- **Builds**: Docker images are pushed natively to `avinash3003/task-tracker-cicd` using dynamic `${{ github.sha }}` immutable tags.
+- **Builds**: Docker images are pushed natively to `avinash3003/task-tracker-cicd` using the following tagging strategy:
+
+| Service | Image Tag |
+|---|---|
+| Backend | `backend-v${{ github.run_number }}` |
+| Frontend | `frontend-v${{ github.run_number }}` |
+
 - **Delivery**: `kubectl set image` applies a Zero-Downtime Rolling Update sequentially to the pods.
 - **Verification**: `smoke_test.sh` generates a temporary K8s container to ping the internal `/health` endpoints.
 

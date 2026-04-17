@@ -3,3 +3,4 @@ __pycache__/
 task_tracker.db
 Dockerfile
 app.log
+.env.dev
